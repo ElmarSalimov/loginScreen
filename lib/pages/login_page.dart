@@ -11,9 +11,32 @@ class LoginPage extends StatelessWidget {
 
   LoginPage({super.key, required this.onTap});
 
-  void login() async {
-    await FirebaseAuth.instance.signInWithEmailAndPassword(
-        email: _emailController.text, password: _passwordController.text);
+  void login(BuildContext context) async {
+    showDialog(
+        context: context,
+        builder: (context) {
+          return const Center(child: CircularProgressIndicator());
+        });
+
+    try {
+      await FirebaseAuth.instance.signInWithEmailAndPassword(
+          email: _emailController.text, password: _passwordController.text);
+      if (context.mounted) {
+        Navigator.of(context).pop();
+      }
+    } on FirebaseAuthException {
+      if (context.mounted) {
+        Navigator.of(context).pop();
+        ScaffoldMessenger.of(context)
+            .showSnackBar(const SnackBar(content: Text("Error")));
+      }
+    } catch (e) {
+      if (context.mounted) {
+        Navigator.of(context).pop();
+        ScaffoldMessenger.of(context)
+            .showSnackBar(const SnackBar(content: Text("Error")));
+      }
+    }
   }
 
   @override
@@ -53,7 +76,7 @@ class LoginPage extends StatelessWidget {
 
               // Button
               GestureDetector(
-                onTap: login,
+                onTap: () => login(context),
                 child: Container(
                   padding: const EdgeInsets.symmetric(vertical: 18),
                   margin: const EdgeInsets.symmetric(horizontal: 70),

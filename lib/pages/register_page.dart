@@ -19,7 +19,7 @@ class _RegisterPageState extends State<RegisterPage> {
 
   final _confirmPasswordController = TextEditingController();
 
-  void register() async {
+  void register(BuildContext context) async {
     if (_passwordController.text == _confirmPasswordController.text) {
       showDialog(
           context: context,
@@ -33,20 +33,32 @@ class _RegisterPageState extends State<RegisterPage> {
           password: _passwordController.text,
         );
 
-        Navigator.of(context).pop();
+        if (context.mounted) {
+          Navigator.of(context).pop();
+        }
       } on FirebaseAuthException catch (e) {
-        Navigator.of(context).pop();
+        if (context.mounted) {
+          Navigator.of(context).pop();
+        }
         if (e.code == 'weak-password') {
-          print('The password provided is too weak.');
+          if (context.mounted) {
+            ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(content: Text("Password is weak")));
+          }
         } else if (e.code == 'email-already-in-use') {
-          print('The account already exists for that email.');
+          if (context.mounted) {
+            ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(content: Text("Email is already in use")));
+          }
         }
       } catch (e) {
-        Navigator.of(context).pop();
-        print(e);
+        if (context.mounted) {
+          Navigator.of(context).pop();
+        }
       }
     } else {
-      print("Passwords do not match");
+      ScaffoldMessenger.of(context)
+          .showSnackBar(const SnackBar(content: Text("Password do not match")));
     }
   }
 
@@ -92,7 +104,7 @@ class _RegisterPageState extends State<RegisterPage> {
 
               // Button
               GestureDetector(
-                onTap: register,
+                onTap: () => register(context),
                 child: Container(
                   padding: const EdgeInsets.symmetric(vertical: 18),
                   margin: const EdgeInsets.symmetric(horizontal: 70),

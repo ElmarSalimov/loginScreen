@@ -1,64 +1,24 @@
+import 'package:chat_app/auth/auth_service.dart';
 import 'package:chat_app/util/my_text_field.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 
-class RegisterPage extends StatefulWidget {
+class RegisterPage extends StatelessWidget {
   void Function()? onTap;
+
+  final _emailController = TextEditingController();
+  final _passwordController = TextEditingController();
+  final _confirmPasswordController = TextEditingController();
 
   RegisterPage({super.key, required this.onTap});
 
-  @override
-  State<RegisterPage> createState() => _RegisterPageState();
-}
-
-class _RegisterPageState extends State<RegisterPage> {
-  final _emailController = TextEditingController();
-
-  final _passwordController = TextEditingController();
-
-  final _confirmPasswordController = TextEditingController();
-
   void register(BuildContext context) async {
-    if (_passwordController.text == _confirmPasswordController.text) {
-      showDialog(
-          context: context,
-          builder: (context) {
-            return const Center(child: CircularProgressIndicator());
-          });
-
-      try {
-        await FirebaseAuth.instance.createUserWithEmailAndPassword(
-          email: _emailController.text,
-          password: _passwordController.text,
-        );
-
-        if (context.mounted) {
-          Navigator.of(context).pop();
-        }
-      } on FirebaseAuthException catch (e) {
-        if (context.mounted) {
-          Navigator.of(context).pop();
-        }
-        if (e.code == 'weak-password') {
-          if (context.mounted) {
-            ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(content: Text("Password is weak")));
-          }
-        } else if (e.code == 'email-already-in-use') {
-          if (context.mounted) {
-            ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(content: Text("Email is already in use")));
-          }
-        }
-      } catch (e) {
-        if (context.mounted) {
-          Navigator.of(context).pop();
-        }
-      }
-    } else {
-      ScaffoldMessenger.of(context)
-          .showSnackBar(const SnackBar(content: Text("Password do not match")));
+    final auth = AuthService();
+    try {
+      await auth.register(
+          context, _emailController.text, _passwordController.text, _confirmPasswordController.text);
+    } catch (e) {
+      print(e.toString());
     }
   }
 
@@ -125,7 +85,7 @@ class _RegisterPageState extends State<RegisterPage> {
 
               // Bottom text
               GestureDetector(
-                onTap: widget.onTap,
+                onTap: onTap,
                 child: const Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [

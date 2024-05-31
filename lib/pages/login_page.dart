@@ -1,41 +1,25 @@
+import 'dart:js';
+
+import 'package:chat_app/auth/auth_service.dart';
 import 'package:chat_app/util/my_text_field.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 class LoginPage extends StatelessWidget {
-  void Function()? onTap;
 
+  final void Function()? onTap;
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
 
   LoginPage({super.key, required this.onTap});
 
   void login(BuildContext context) async {
-    showDialog(
-        context: context,
-        builder: (context) {
-          return const Center(child: CircularProgressIndicator());
-        });
-
+    final auth = AuthService();
     try {
-      await FirebaseAuth.instance.signInWithEmailAndPassword(
-          email: _emailController.text, password: _passwordController.text);
-      if (context.mounted) {
-        Navigator.of(context).pop();
-      }
-    } on FirebaseAuthException {
-      if (context.mounted) {
-        Navigator.of(context).pop();
-        ScaffoldMessenger.of(context)
-            .showSnackBar(const SnackBar(content: Text("Error")));
-      }
-    } catch (e) {
-      if (context.mounted) {
-        Navigator.of(context).pop();
-        ScaffoldMessenger.of(context)
-            .showSnackBar(const SnackBar(content: Text("Error")));
-      }
+      await auth.login(context, _emailController.text, _passwordController.text);
+    }
+    catch (e) {
+      print(e.toString());
     }
   }
 

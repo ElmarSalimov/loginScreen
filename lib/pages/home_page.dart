@@ -29,10 +29,11 @@ class _HomePageState extends State<HomePage> {
         title: const Text("TURQAY NOTES"),
         backgroundColor: Colors.grey[300],
       ),
-      
-      
       body: StreamBuilder<QuerySnapshot>(
-        stream: FirebaseFirestore.instance.collection('users').snapshots(),
+        stream: FirebaseFirestore.instance
+            .collection('users')
+            .where('email', isEqualTo: currentUser.email)
+            .snapshots(),
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
             return const Center(child: CircularProgressIndicator());
@@ -41,16 +42,20 @@ class _HomePageState extends State<HomePage> {
             return const Center(child: Text("An error occurred"));
           }
           if (snapshot.hasData) {
-            final users = snapshot.data!.docs;
+            final userDocs = snapshot.data!.docs;
+            if (userDocs.isEmpty) {
+              return const Center(child: Text("No notes found for this user"));
+            }
+            final user = userDocs.first;
+            final Map<String, dynamic> notes = user['notes'];
             return ListView.builder(
-              itemCount: users.length,
+              itemCount: notes.length,
               itemBuilder: (context, index) {
-                final user = users[index];
-                final Map<String, dynamic> notes = user['notes'];
+                final noteTitle = notes.keys.elementAt(index);
+                final noteContent = notes[noteTitle];
                 return ListTile(
-                  title: Text(user['email']),
-                  subtitle: Text(user['password']),
-                  leading: Text(notes.keys.elementAt(0)),
+                  title: Text(noteTitle),
+                  subtitle: Text(noteContent.toString()),
                 );
               },
             );
@@ -58,8 +63,6 @@ class _HomePageState extends State<HomePage> {
           return const Center(child: Text("No users found"));
         },
       ),
-
-      
       floatingActionButton: FloatingActionButton(
         onPressed: signOut,
         child: const Icon(Icons.logout),

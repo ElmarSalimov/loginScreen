@@ -73,10 +73,7 @@ class _HomePageState extends State<HomePage> {
       ),
       drawer: const Drawer(),
       body: StreamBuilder<QuerySnapshot>(
-        stream: FirebaseFirestore.instance
-            .collection('users')
-            .where('email', isEqualTo: currentUser.email)
-            .snapshots(),
+        stream: firestore.getCurrentNotes(),
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
             return const Center(child: CircularProgressIndicator());

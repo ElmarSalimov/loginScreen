@@ -27,86 +27,8 @@ class _HomePageState extends State<HomePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        centerTitle: true,
-        title: const Text("TURQAY NOTES"),
-        backgroundColor: Colors.grey[300],
-        leading: Builder(builder: (context) {
-          return GestureDetector(
-              onTap: () {
-                showDialog(
-                    context: context,
-                    builder: (context) {
-                      return AlertDialog(
-                        actions: [
-                          Column(
-                            children: [
-                              MyTextField(
-                                  controller: dialogController,
-                                  hintText: "Add notes",
-                                  obscureText: false),
-                              const SizedBox(
-                                height: 20,
-                              ),
-                              Row(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
-                                children: [
-                                  ElevatedButton(
-                                      onPressed: () {},
-                                      child: const Icon(Icons.delete)),
-                                  ElevatedButton(
-                                      onPressed: () => firestore.addNote(
-                                          currentUser.email,
-                                          dialogController.text),
-                                      child: const Icon(Icons.add))
-                                ],
-                              )
-                            ],
-                          )
-                        ],
-                      );
-                    });
-              },
-              child: const Icon(Icons.menu));
-        }),
-      ),
-      drawer: const Drawer(),
-      body: StreamBuilder<QuerySnapshot>(
-        stream: firestore.getCurrentNotes(),
-        builder: (context, snapshot) {
-          if (snapshot.connectionState == ConnectionState.waiting) {
-            return const Center(child: CircularProgressIndicator());
-          }
-          if (snapshot.hasError) {
-            return const Center(child: Text("An error occurred"));
-          }
-          if (snapshot.hasData) {
-            final userDocs = snapshot.data!.docs;
-            if (userDocs.isEmpty) {
-              return const Center(child: Text("No notes found for this user"));
-            }
-
-            final user = userDocs.first;
-            final Map<String, dynamic> notes = user['notes'];
-            final sortedNotes = notes.entries.toList()
-              ..sort((a, b) => a.key.compareTo(b.key));
-
-            return ListView.builder(
-              itemCount: sortedNotes.length,
-              itemBuilder: (context, index) {
-                final noteTitle = sortedNotes[index].key;
-                final noteContent = notes[noteTitle];
-                return MyTile(
-                    tileText: noteTitle,
-                    isDone: noteContent,
-                    onChanged: (value) =>
-                        firestore.updateNote(currentUser.email, noteTitle));
-              },
-            );
-          }
-          return const Center(child: Text("No users found"));
-        },
+      body: const Center(
+        child: Text("Hello world!"),
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: signOut,

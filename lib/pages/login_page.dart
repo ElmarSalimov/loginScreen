@@ -37,7 +37,7 @@ class LoginPage extends StatelessWidget {
               const SizedBox(height: 20),
 
               // Welcome message
-              Text("Welcome To TurqayChat!",
+              Text("Welcome To The App!",
                   style: GoogleFonts.openSans(
                       textStyle: const TextStyle(
                           fontSize: 24, fontWeight: FontWeight.bold))),
